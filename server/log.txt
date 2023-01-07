@@ -1,0 +1,247 @@
+
+New Connection in request channel, address 127.0.0.1:36450
+New Connection in data channel, address 127.0.0.2:44692
+
+[Thu Jan  5 13:06:40 2023]
+Adding to list of sockets as: 0
+
+[Thu Jan  5 13:06:45 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:36452
+New Connection in data channel, address 127.0.0.2:44694
+
+[Thu Jan  5 13:07:47 2023]
+Adding to list of sockets as: 0
+
+[Thu Jan  5 13:07:53 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Thu Jan  5 13:08:04 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Thu Jan  5 13:08:10 2023]
+client Ali with command socket id: 6, data socket id: 7, used 'help' command.
+[Thu Jan  5 13:09:06 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:36458
+New Connection in data channel, address 127.0.0.2:44696
+
+[Thu Jan  5 13:09:21 2023]
+Adding to list of sockets as: 0
+
+[Thu Jan  5 13:09:27 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Thu Jan  5 13:09:31 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Thu Jan  5 13:09:34 2023]
+client Ali with command socket id: 6, data socket id: 7, used 'help' command.
+[Thu Jan  5 13:10:27 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:36460
+New Connection in data channel, address 127.0.0.2:44698
+
+[Thu Jan  5 13:10:32 2023]
+Adding to list of sockets as: 1
+
+[Thu Jan  5 13:10:35 2023]
+client with command socket id: 8, data socket id: 9, entered username: Ali, should enter password.
+
+[Thu Jan  5 13:10:38 2023]
+client with command socket id: 8, data socket id: 9,logged in as: Ali
+
+[Thu Jan  5 13:10:39 2023]
+client Ali with command socket id: 8, data socket id: 9, used 'help' command.
+[Thu Jan  5 13:12:48 2023]
+client with command socket id: 8, data socket id: 9, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:36462
+New Connection in data channel, address 127.0.0.2:44702
+
+[Thu Jan  5 13:12:52 2023]
+Adding to list of sockets as: 2
+
+[Thu Jan  5 13:12:58 2023]
+client with command socket id: 10, data socket id: 11, entered username: Ali, should enter password.
+
+[Thu Jan  5 13:13:00 2023]
+client with command socket id: 10, data socket id: 11,logged in as: Ali
+
+[Thu Jan  5 13:13:02 2023]
+client Ali with command socket id: 10, data socket id: 11, used 'help' command.
+[Thu Jan  5 13:13:56 2023]
+client with command socket id: 10, data socket id: 11, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:36464
+New Connection in data channel, address 127.0.0.2:44704
+
+[Thu Jan  5 13:14:32 2023]
+Adding to list of sockets as: 0
+
+[Thu Jan  5 13:14:35 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Thu Jan  5 13:14:36 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Thu Jan  5 13:14:39 2023]
+client Ali with command socket id: 6, data socket id: 7, used 'help' command.
+[Thu Jan  5 13:15:15 2023]
+client Ali with command socket id: 6, data socket id: 7, used 'quit' command
+
+[Thu Jan  5 13:15:16 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:54898
+New Connection in data channel, address 127.0.0.2:54810
+
+[Sat Jan  7 17:41:50 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 17:41:57 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:41:59 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Sat Jan  7 17:42:09 2023]
+client Ali with command socket id: 6, data socket id: 7, used 'retr config.json' command
+
+[Sat Jan  7 17:42:27 2023]
+client Ali with command socket id: 6, data socket id: 7 was downloding a file that didn't exist.
+
+[Sat Jan  7 17:44:35 2023]
+client Ali with command socket id: 6, data socket id: 7, used 'quit' command
+
+[Sat Jan  7 17:44:36 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:54900
+New Connection in data channel, address 127.0.0.2:54812
+
+[Sat Jan  7 17:45:04 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 17:45:08 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:45:10 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+New Connection in request channel, address 127.0.0.1:54902
+New Connection in data channel, address 127.0.0.2:54814
+
+[Sat Jan  7 17:46:17 2023]
+Adding to list of sockets as: 1
+
+[Sat Jan  7 17:46:22 2023]
+client with command socket id: 8, data socket id: 9, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:46:27 2023]
+client with command socket id: 8, data socket id: 9,logged in as: Ali
+
+[Sat Jan  7 17:46:31 2023]
+client Ali with command socket id: 8, data socket id: 9 was downloding a file that didn't exist.
+
+New Connection in request channel, address 127.0.0.1:54904
+New Connection in data channel, address 127.0.0.2:54816
+
+[Sat Jan  7 17:48:24 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 17:48:27 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:48:30 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Sat Jan  7 17:48:38 2023]
+client Ali with command socket id: 6, data socket id: 7 was downloding a file that didn't exist.
+
+New Connection in request channel, address 127.0.0.1:54906
+New Connection in data channel, address 127.0.0.2:54818
+
+[Sat Jan  7 17:51:09 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 17:51:12 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:51:13 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Sat Jan  7 17:52:36 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:54908
+New Connection in data channel, address 127.0.0.2:54820
+
+[Sat Jan  7 17:52:47 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 17:52:49 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:52:52 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Sat Jan  7 17:54:55 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:54910
+New Connection in data channel, address 127.0.0.2:54822
+
+[Sat Jan  7 17:55:05 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 17:55:08 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 17:55:10 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+New Connection in request channel, address 127.0.0.1:54924
+New Connection in data channel, address 127.0.0.2:54824
+
+[Sat Jan  7 18:00:26 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 18:00:29 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 18:00:30 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+New Connection in request channel, address 127.0.0.1:54926
+New Connection in data channel, address 127.0.0.2:54828
+
+[Sat Jan  7 18:03:12 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 18:03:15 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 18:03:17 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Sat Jan  7 18:15:16 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
+
+New Connection in request channel, address 127.0.0.1:54934
+New Connection in data channel, address 127.0.0.2:54830
+
+[Sat Jan  7 18:15:49 2023]
+Adding to list of sockets as: 0
+
+[Sat Jan  7 18:15:55 2023]
+client with command socket id: 6, data socket id: 7, entered username: Ali, should enter password.
+
+[Sat Jan  7 18:15:57 2023]
+client with command socket id: 6, data socket id: 7,logged in as: Ali
+
+[Sat Jan  7 18:18:50 2023]
+client with command socket id: 6, data socket id: 7, entered an unknown command.
