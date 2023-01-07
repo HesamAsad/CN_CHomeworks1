@@ -1,6 +1,6 @@
 #include "server.h"
 
-void Server::printTime() {
+void Server::print_time() {
   std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char* timeStr = std::ctime(&now);
   timeStr[24]='\0';
@@ -11,7 +11,7 @@ void Server::parse_json() {
   json.jsonParser();
   users_list = json.getUsers();
   protected_files = json.getFiles();
-  bool exists = fileExists("log.txt");
+  bool exists = file_exists("log.txt");
   logs.open("log.txt", std::ios_base::app);
   if(!exists) {
     logs << "Users: " << std::endl;
@@ -31,14 +31,14 @@ void Server::parse_json() {
 }
 
 void Server::printSyntaxError(std::string command, int commandSocket, int dataSocket, std::string username) {
-  printTime();
+  print_time();
   logs << "SYNTAX ERROR\n";
   logs << "client " << username << " with command socket id: " << commandSocket << 
       ", data socket id: " << dataSocket << ", had a synatx error in using '" << command << "' command." << std::endl;
 }
 
 void Server::printLoginError(std::string command, int commandSocket, int dataSocket) {
-  printTime();
+  print_time();
   logs << "LOGIN ERROR\n";
   logs<<"client with command socket id: "<<commandSocket<<", data socket id: "
       << dataSocket << ", used '" <<command << "' without logging in." << std::endl;
@@ -60,7 +60,7 @@ std::vector<std::string> Server::parse_command(char command[]) {
     return parsed;
 }
 
-socketData Server::handleConnections(){
+socketData Server::handle_connections(){
   int reqSocket;
   int dataSocket;
   int addrlen;
@@ -99,7 +99,7 @@ socketData Server::handleConnections(){
           dataSockets[i] = dataSocket;
           newSocket.commandSocket = reqSocket;
           newSocket.dataSocket = dataSocket;
-          printTime();
+          print_time();
           logs<<"Adding to list of sockets as: "<<i<<std::endl;
           break;
       }
@@ -107,7 +107,7 @@ socketData Server::handleConnections(){
   return (newSocket);
 }
 
-void Server::connectCh(char* ports[]){
+void Server::connect_channel(char* ports[]){
     if((request_channel = socket(AF_INET, SOCK_STREAM, 0)) < 0 
         || (data_channel = socket(AF_INET, SOCK_STREAM, 0 )) < 0)
     {
@@ -145,14 +145,14 @@ void Server::connectCh(char* ports[]){
     }
 }
 
-bool Server::findUsername(std::string username){
+bool Server::find_username(std::string username){
   for(int i = 0; i < users_list.size(); i++)
     if(users_list[i].get_username() == username)
       return true;
   return false;
 }
 
-bool Server::findPass(std::string password, std::string username, bool* isAdmin){
+bool Server::find_pass(std::string password, std::string username, bool* isAdmin){
   for(int i = 0; i < users_list.size(); i++)
     if(users_list[i].get_password() == password && users_list[i].get_username() == username){
       *isAdmin = users_list[i].is_admin();
@@ -161,11 +161,11 @@ bool Server::findPass(std::string password, std::string username, bool* isAdmin)
   return false;
 }
 
-void Server::handleUser(std::string* loggedInUsername, bool* user, bool pass, int commandSocket,
+void Server::handle_user(std::string* loggedInUsername, bool* user, bool pass, int commandSocket,
                          int dataSocket, std::vector<std::string> parsed) {
   if(*user && pass) {
     send(commandSocket, "500: Error", 12, 0);
-    printTime();
+    print_time();
     logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
         <<", tried to change username when logged in."<<std::endl;
     return;
@@ -177,11 +177,11 @@ void Server::handleUser(std::string* loggedInUsername, bool* user, bool pass, in
     *loggedInUsername = "";
   }
   else{
-    if(findUsername(parsed[1])){
+    if(find_username(parsed[1])){
       send(commandSocket, "331: User name okay, need password.", 36, 0);
       *user = true;
       *loggedInUsername = parsed[1];
-      printTime();
+      print_time();
       logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
           <<", entered username: "<<parsed[1]<<", should enter password."<<std::endl;
     }
@@ -189,14 +189,14 @@ void Server::handleUser(std::string* loggedInUsername, bool* user, bool pass, in
       send(commandSocket, "430: Invalid username or password.", 35, 0);
       *user = false;
       *loggedInUsername = "";
-      printTime();
+      print_time();
       logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
           <<", entered an invalid username."<<std::endl; 
     }
   }
 }
 
-void Server::handleInfo(void* newSocket) {
+void Server::handle_info(void* newSocket) {
   bool user = false, pass = false;
   socketData * sock = (socketData *)newSocket;
   std::string loggedInUsername, directory = "./server";
@@ -206,11 +206,11 @@ void Server::handleInfo(void* newSocket) {
       recv(sock->commandSocket, in, 256, 0);
       std::vector<std::string> parsed = parse_command(in);
       if(parsed[0] == "user")
-        handleUser(&loggedInUsername, &user, pass, sock->commandSocket, sock->dataSocket, parsed);
+        handle_user(&loggedInUsername, &user, pass, sock->commandSocket, sock->dataSocket, parsed);
       else if(parsed[0] == "pass")
-        handlePass(loggedInUsername, &user, &pass, sock->commandSocket, sock->dataSocket, parsed, &isAdmin);
+        handle_password(loggedInUsername, &user, &pass, sock->commandSocket, sock->dataSocket, parsed, &isAdmin);
       else if(parsed[0] == "help")
-        handleHelp(parsed, sock->commandSocket, sock->dataSocket, user, pass, loggedInUsername);
+        handle_help(parsed, sock->commandSocket, sock->dataSocket, user, pass, loggedInUsername);
       else if(parsed[0] == "retr")
         handle_dl(parsed, sock->commandSocket, sock->dataSocket, user, pass, isAdmin, directory, loggedInUsername);
       else if(parsed[0] == "Upload")
@@ -223,18 +223,18 @@ void Server::handleInfo(void* newSocket) {
   }
 }
 
-void Server::handlePass(std::string username, bool* user, bool* pass, int commandSocket, int dataSocket, 
+void Server::handle_password(std::string username, bool* user, bool* pass, int commandSocket, int dataSocket, 
                         std::vector<std::string> parsed, bool* isAdmin){
   if(*user && *pass){
     send(commandSocket, "500: Error", 12, 0);
-    printTime();
+    print_time();
     logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
         <<", tried to enter password when logged in."<<std::endl;
     return;
   }
   if(!(*user)){
     send(commandSocket, "503: Bad sequence of commands.", 31, 0);
-    printTime();
+    print_time();
     logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
         <<", entered password before entering username."<<std::endl;
     *pass = false;
@@ -247,8 +247,8 @@ void Server::handlePass(std::string username, bool* user, bool* pass, int comman
     return;
   }
   else{
-    printTime();
-    if(findPass(parsed[1], username, isAdmin)){
+    print_time();
+    if(find_pass(parsed[1], username, isAdmin)){
       send(commandSocket, "230: User logged in, proceed. Logged out if appropriate.", 57, 0);
       logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
           <<",logged in as: "<<username<<std::endl;
@@ -265,7 +265,7 @@ void Server::handlePass(std::string username, bool* user, bool* pass, int comman
   
 }
 
-void Server::handleHelp(std::vector<std::string> parsed, int commandSocket, 
+void Server::handle_help(std::vector<std::string> parsed, int commandSocket, 
               int dataSocket, bool user, bool pass, std::string username) { 
   if(!user || !pass){
     send(commandSocket, "332: Need account for login.", 29, 0);
@@ -279,7 +279,7 @@ void Server::handleHelp(std::vector<std::string> parsed, int commandSocket,
   }
   send(commandSocket, "214", 4, 0);
   send_help(commandSocket);
-  printTime();
+  print_time();
   logs << "client " << username << " with command socket id: " << commandSocket 
         << ", data socket id: " << dataSocket << ", used 'help' command.";
 
@@ -319,18 +319,18 @@ void Server::handle_dl(std::vector<std::string> parsed, int commandSocket, int d
     printSyntaxError("retr", commandSocket, dataSocket, loggedInUsername);
     return;
   }
-  std::string path = getCurrPath() + fixAddrss(cwd);
+  std::string path = get_curr_path() + fix_address(cwd);
   path += "/" + parsed[1];
-  if(!fileExists(path.c_str())){
-      printTime();
+  if(!file_exists(path.c_str())){
+      print_time();
       logs<<"client "<<loggedInUsername<<" with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
           <<" was downloding a file that didn't exist."<<std::endl;
       send(commandSocket, "!500: Error", 12, 0);
       return;
   }
-  std::string file = findFileName(parsed[1]);
+  std::string file = find_file_name(parsed[1]);
   if(std::count(protected_files.begin(), protected_files.end(), file) > 0 && !isAdmin){
-    printTime();
+    print_time();
     logs<<"client "<<loggedInUsername<<" with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
         <<" was downloading a file that was inaccessible."<<std::endl;
     send(commandSocket, "!550: File unavailable.", 24, 0);
@@ -347,7 +347,7 @@ void Server::handle_dl(std::vector<std::string> parsed, int commandSocket, int d
       int remaining_size = users_list[i].get_size();
       int content_size = content.size();
       if((remaining_size - content_size) < 0) {
-        printTime();
+        print_time();
         logs << "SIZE ERROR\n";
         logs<<"client "<<loggedInUsername<<" with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
             <<" was downloading a too large file."<<std::endl;
@@ -355,7 +355,7 @@ void Server::handle_dl(std::vector<std::string> parsed, int commandSocket, int d
         return;
       } 
       else {
-        users_list[i].decreaseSize(content.size());
+        users_list[i].decrease_size(content.size());
         break;
       }
     }
@@ -363,7 +363,7 @@ void Server::handle_dl(std::vector<std::string> parsed, int commandSocket, int d
 
   send(commandSocket, "#226: Successfull Download.", 28, 0);
   send(dataSocket, content.c_str(), content.size()+1, 0);
-  printTime();
+  print_time();
   logs<<"client "<<loggedInUsername<<" with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
       <<", used 'retr " << parsed[1] <<"' command"<<std::endl;
 }
@@ -388,7 +388,7 @@ void Server::handle_upload(std::vector<std::string> parsed, int commandSocket, i
   const char* dirname = "Files";
   mkdir(dirname,0777);
 
-  std::string path = getCurrPath() + fixAddrss(cwd);
+  std::string path = get_curr_path() + fix_address(cwd);
   path += "/" + parsed[1];
 
   char* result = new char[256];
@@ -412,8 +412,8 @@ void Server::handle_upload(std::vector<std::string> parsed, int commandSocket, i
       memset(msg, 0, 50); 
   }
   std::ofstream out;
-  std::cout << getCurrPath() + std::string("/Files/") + parsed[1] << std::endl;
-  out.open(getCurrPath() + std::string("/Files/") + parsed[1]);
+  std::cout << get_curr_path() + std::string("/Files/") + parsed[1] << std::endl;
+  out.open(get_curr_path() + std::string("/Files/") + parsed[1]);
   out << file_content;
   out.close();
   std::cout << result+1 << std::endl;
@@ -433,7 +433,7 @@ void Server::handle_quit(std::vector<std::string> parsed, int commandSocket, int
     printSyntaxError("quit", commandSocket, dataSocket, *loggedInUsername);
     return;
   }
-  printTime();
+  print_time();
   logs<<"client "<<*loggedInUsername<<" with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
       <<", used 'quit' command"<<std::endl;
   *user = false; *pass = false; *isAdmin = false;
@@ -445,6 +445,7 @@ void Server::send_help(int commandSocket) {
   std::string str = "\nUSER <username>:\nUsed for authentication, gets the username as input and if it is found gives <331:Username okay, need password> as output.";
   str += "\n Pass <password>:\nafter inserting the username, the password is required to login to your account.";
   str += "\n retr <name>:\nyou can download a file in the current working directory if you have the required data size.";
+  str += "\n Upload <name>:\nyou can upload a file from the current working directory if it's less than 1024KB.";
   str += "\n help:\nlists all the possible commands with their manual.";
   str += "\n quit:\nlogout of the system.\n";
   send(commandSocket, str.c_str(), str.size(), 0);
@@ -452,7 +453,7 @@ void Server::send_help(int commandSocket) {
 
 void Server::handle_error(int commandSocket, int dataSocket){
   send(commandSocket, "500: Error", 11, 0);
-  printTime();
+  print_time();
   logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
       <<", entered an unknown command."<<std::endl;
 }

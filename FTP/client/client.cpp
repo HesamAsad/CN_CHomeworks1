@@ -6,13 +6,13 @@ struct sockaddr_in dataSocketAddr;
 int broadcastFD;
 int dataFD;
 
-bool fileExists(const char* filename){
+bool file_exists(const char* filename){
     std::ifstream infile(filename);
     return infile.good();
 }
 
 
-void Client::connectCh(char* ports[]) {
+void Client::connect_channel(char* ports[]) {
     if((broadcastFD = socket(AF_INET, SOCK_STREAM, 0)) < 0 ||
         (dataFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         std::cout << "failed to open socket" << std::endl;
@@ -40,7 +40,7 @@ void Client::connectCh(char* ports[]) {
     delete in;
 }
 
-void Client::handleInfo() {
+void Client::handle_info() {
     char in[256];
     std::cin.getline(in, 256);
     if(send(broadcastFD, in, sizeof(in), 0) < 0)
@@ -48,7 +48,7 @@ void Client::handleInfo() {
     if(strcmp(in, "exit") == 0)
         exit(EXIT_SUCCESS);
     if(strcmp(in, "help") == 0){
-        handleHelp();
+        handle_help();
         return;
     }
     else if (in[0] == 'r' && in[1] == 'e' && 
@@ -59,7 +59,7 @@ void Client::handleInfo() {
     else if (in[0] == 'U' && in[1] == 'p' && 
                 in[2] == 'l' && in[3] == 'o' && 
                 in[4] == 'a' && in[5] == 'd') {        //Upload
-        handleUpload(in+7);
+        handle_upload(in+7);
         return;
     }
     char* msg = new char[256]; 
@@ -67,7 +67,7 @@ void Client::handleInfo() {
     std::cout << msg << std::endl;
 }
 
-void Client::handleHelp() {
+void Client::handle_help() {
     char* msg = new char[256]; 
     recv(broadcastFD, msg, 256, 0);
     msg[strlen(msg)] = '\0';
@@ -113,8 +113,8 @@ void Client::handle_dl(char* file_name) {
     delete msg;
 }
 
-void Client::handleUpload(char* file_name) {
-    if(!fileExists(file_name)){
+void Client::handle_upload(char* file_name) {
+    if(!file_exists(file_name)){
         cout << "FILE DOESN'T EXIST!" << endl;
         send(broadcastFD, "!500: Error", 12, 0);
         return;

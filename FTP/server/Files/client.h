@@ -24,9 +24,9 @@ char* str2charstar(std::string s);
 
 class Client {
   public:
-    void connectCh(char* ports[]);
-    void handleInfo();
-    void handleHelp();
+    void connect_channel(char* ports[]);
+    void handle_info();
+    void handle_help();
     void handle_dl(char* file_name);
-    void handleUpload(char* file_name);
+    void handle_upload(char* file_name);
 };

@@ -11,22 +11,22 @@ class  Server {
       parse_json();
     }
     void parse_json();
-    socketData handleConnections();
-    void connectCh(char* argv[]);
-    bool findUsername(std::string);
-    bool findPass(std::string , std::string, bool*);
-    void handleUser(std::string*, bool*, bool, int, int, std::vector<std::string>);
-    void handlePass(std::string, bool*, bool*, int, int, std::vector<std::string>, bool*);
-    void handleInfo(void* );
-    void handleHelp(std::vector<std::string>, int, int, bool, bool, std::string);
-    void send_help(int);
+    std::vector<std::string> parse_command(char[]);
+    std::string checkForServer(std::string cwd, bool*);
+    socketData handle_connections();
+    void connect_channel(char* argv[]);
+    bool find_username(std::string);
+    bool find_pass(std::string , std::string, bool*);
+    void handle_user(std::string*, bool*, bool, int, int, std::vector<std::string>);
+    void handle_password(std::string, bool*, bool*, int, int, std::vector<std::string>, bool*);
+    void handle_help(std::vector<std::string>, int, int, bool, bool, std::string);
     void handle_dl(std::vector<std::string>, int, int, bool, bool, bool, std::string, std::string);
     void handle_upload(std::vector<std::string>, int, int, bool, bool, bool, std::string, std::string);
-    std::vector<std::string> parse_command(char[]);
     void handle_quit(std::vector<std::string>, int, int, bool*, bool*, std::string*,bool*, std::string*);
-    void printTime();
+    void handle_info(void* );
+    void send_help(int);
     void handle_error(int, int);
-    std::string checkForServer(std::string cwd, bool*);
+    static void print_time();
 
   private:
     Json json;

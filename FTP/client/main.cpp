@@ -7,7 +7,7 @@ int main(int argc, char *argv[]){
     char** ports = new char*[2];
     ports[0] = str2charstar(json.getCommandPort());
     ports[1] = str2charstar(json.getDataPort());
-    c.connectCh(ports);
+    c.connect_channel(ports);
 
-    FOREVER c.handleInfo();
+    FOREVER c.handle_info();
 }

@@ -1,6 +1,6 @@
 #include "User.h"
 
-void User::decreaseSize(int size_) {
+void User::decrease_size(int size_) {
     size -= size_;
 }
 

@@ -28,7 +28,7 @@ char* itoa_simple(char *dest, int i) {
   return dest;
 }
 
-bool fileExists(const char* filename){
+bool file_exists(const char* filename){
     std::ifstream infile(filename);
     return infile.good();
 }
@@ -49,7 +49,7 @@ std::vector<std::string> parse_msg(char* msg){
   return parsed;
 }
 
-std::string fixAddrss(std::string path){
+std::string fix_address(std::string path){
   std::string str;
   int i = 0;
   while(str != "./server"){
@@ -64,7 +64,7 @@ std::string fixAddrss(std::string path){
   return str;
 }
 
-bool directoryExists(std::string dir){
+bool directory_exists(std::string dir){
   struct stat buffer;
   return (stat(dir.c_str(), &buffer) == 0);
 }
@@ -80,7 +80,7 @@ std::string move_back(std::string path){
   return newPath;
 }
 
-std::string findFileName(std::string path){
+std::string find_file_name(std::string path){
   int i = 0, j = 0;
   while(j < path.size()){
     if(path[j] == '/')
@@ -96,7 +96,7 @@ std::string findFileName(std::string path){
   return str;
 }
 
-std::string findDir(std::string path){
+std::string find_directory(std::string path){
   int i = 0, j = 0;
   while(j < path.size()){
     if(path[j] == '/')
@@ -109,7 +109,7 @@ std::string findDir(std::string path){
   return str;
 }
 
-std::string getCurrPath(){
+std::string get_curr_path(){
    char temp[256];
    return ( getcwd(temp, sizeof(temp)) ? std::string( temp ) : std::string("") );
 }

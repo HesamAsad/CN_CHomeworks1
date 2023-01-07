@@ -7,13 +7,13 @@ int main(int argc, char *argv[]) {
   char** ports = new char*[2];
   ports[0] = str2charstar(json.getCommandPort());
   ports[1] = str2charstar(json.getDataPort());
-  server.connectCh(ports);
+  server.connect_channel(ports);
   std::cout << "Server is running..." << std::endl;
   while(1) {
-    socketData sock = server.handleConnections();
+    socketData sock = server.handle_connections();
     int fork_c = fork();
     if(fork_c == 0) {
-      server.handleInfo(static_cast<void*> (&sock));
+      server.handle_info(static_cast<void*> (&sock));
       break;
     }
   }

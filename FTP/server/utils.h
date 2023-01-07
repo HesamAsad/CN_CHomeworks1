@@ -37,15 +37,15 @@ char* str2charstar(std::string s);
 static char* itoa_simple_helper(char *dest, int i);
 char* itoa_simple(char *dest, int i);
 
-bool fileExists(const char*);
-bool directoryExists(std::string dir);
+bool file_exists(const char*);
+bool directory_exists(std::string dir);
 
 std::vector<std::string> ls(std::string);
 
-std::string getCurrPath();
-std::string fixAddrss(std::string path);
+std::string get_curr_path();
+std::string fix_address(std::string path);
 
 std::string move_back(std::string path);
 
-std::string findFileName(std::string path);
-std::string findDir(std::string path);
+std::string find_file_name(std::string path);
+std::string find_directory(std::string path);
