@@ -15,13 +15,12 @@ void Server::parse_json() {
   logs.open("log.txt", std::ios_base::app);
   if(!exists) {
     logs << "Users: " << std::endl;
-    for(int i = 0; i < users_list.size(); i++){
+    for(int i = 0; i < users_list.size(); i++) {
         logs << "\tusername: " << users_list[i].get_username() << std::endl;
         logs << "\tpassword: " << users_list[i].get_password() << std::endl;
         logs << "\tadmin: " << (users_list[i].is_admin()) ? "true\n" : "false\n";
         logs << "\tsize: " << users_list[i].get_size() << std::endl;
         logs << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-        
     }
     logs << "Files:" << std::endl;
     for(int i = 0; i < protected_files.size(); i++)
@@ -30,14 +29,14 @@ void Server::parse_json() {
   }
 }
 
-void Server::printSyntaxError(std::string command, int commandSocket, int dataSocket, std::string username) {
+void Server::print_syntax_error(std::string command, int commandSocket, int dataSocket, std::string username) {
   print_time();
   logs << "SYNTAX ERROR\n";
   logs << "client " << username << " with command socket id: " << commandSocket << 
       ", data socket id: " << dataSocket << ", had a synatx error in using '" << command << "' command." << std::endl;
 }
 
-void Server::printLoginError(std::string command, int commandSocket, int dataSocket) {
+void Server::print_login_error(std::string command, int commandSocket, int dataSocket) {
   print_time();
   logs << "LOGIN ERROR\n";
   logs<<"client with command socket id: "<<commandSocket<<", data socket id: "
@@ -45,22 +44,22 @@ void Server::printLoginError(std::string command, int commandSocket, int dataSoc
 }
 
 std::vector<std::string> Server::parse_command(char command[]) {
-    std::vector<std::string> parsed;
-    std::string str;
-    for(int i = 0; i < strlen(command); i++) {
-      if(command[i] == ' ' || command[i] == '\n') {
-        parsed.push_back(str);
-        str = "";
-        continue;
-      }
-      str += command[i];
-    }
-    if(str != "")
+  std::vector<std::string> parsed;
+  std::string str;
+  for(int i = 0; i < strlen(command); i++) {
+    if(command[i] == ' ' || command[i] == '\n') {
       parsed.push_back(str);
-    return parsed;
+      str = "";
+      continue;
+    }
+    str += command[i];
+  }
+  if(str != "")
+    parsed.push_back(str);
+  return parsed;
 }
 
-socketData Server::handle_connections(){
+socketData Server::handle_connections() {
   int reqSocket;
   int dataSocket;
   int addrlen;
@@ -71,30 +70,30 @@ socketData Server::handle_connections(){
   memset(&dataAddrss, 0, sizeof(dataAddrss));
   addrlen = sizeof(reqaddress);
   addrlen2 = sizeof(dataAddrss);
-  if ((reqSocket= accept(request_channel, (struct sockaddr *)&reqaddress, (socklen_t*)&addrlen)) < 0){
-      std::cout<<"accept"<<std::endl;
+  if ((reqSocket= accept(request_channel, (struct sockaddr *)&reqaddress, (socklen_t*)&addrlen)) < 0) {
+      std::cout << "accept" << std::endl;
       exit(EXIT_FAILURE);
   }
   char* addr = inet_ntoa(reqaddress.sin_addr);
   char port[256]; 
   itoa_simple(port, ntohs(reqaddress.sin_port));
   std::string msg  = "connected to req channel";
-  logs<<"\nNew Connection in request channel, address 127.0.0.1:"<<port<<std::endl;
+  logs << "\nNew Connection in request channel, address 127.0.0.1:" << port << std::endl;
   send(reqSocket, str2charstar(msg), 42, 0);
-  if((dataSocket = accept(data_channel, (struct sockaddr *)&dataAddrss, (socklen_t*)&addrlen2)) < 0){
-      std::cout<<"accept"<<std::endl;
+  if((dataSocket = accept(data_channel, (struct sockaddr *)&dataAddrss, (socklen_t*)&addrlen2)) < 0) {
+      std::cout << "accept" <<std::endl;
       exit(EXIT_FAILURE);
   }
   addr = inet_ntoa(dataAddrss.sin_addr);
   port[256]; 
   itoa_simple(port, ntohs(dataAddrss.sin_port));
   msg  = "connected to data channel";
-  logs<<"New Connection in data channel, address 127.0.0.2:"<<port<<std::endl;
+  logs << "New Connection in data channel, address 127.0.0.2:" << port << std::endl;
   send(dataSocket, str2charstar(msg), 39, 0);
   int t, i;
   socketData newSocket;
-  for (i = 0; i < CLIENT_COUNT; i++){
-      if( clientSockets[i] == 0 && dataSockets[i] == 0){
+  for (i = 0; i < CLIENT_COUNT; i++) {
+      if( clientSockets[i] == 0 && dataSockets[i] == 0) {
           clientSockets[i] = reqSocket;
           dataSockets[i] = dataSocket;
           newSocket.commandSocket = reqSocket;
@@ -172,7 +171,7 @@ void Server::handle_user(std::string* loggedInUsername, bool* user, bool pass, i
   }
   if(parsed.size() != 2){
     send(commandSocket, "501: Syntax error in parameters or arguments.", 46, 0);
-    printSyntaxError("user", commandSocket, dataSocket, *loggedInUsername);
+    print_syntax_error("user", commandSocket, dataSocket, *loggedInUsername);
     *user = false;
     *loggedInUsername = "";
   }
@@ -242,7 +241,7 @@ void Server::handle_password(std::string username, bool* user, bool* pass, int c
   }
   if(parsed.size() != 2){
     send(commandSocket, "501: Syntax error in parameters or arguments.", 46, 0);
-    printSyntaxError("pass", commandSocket, dataSocket, "");
+    print_syntax_error("pass", commandSocket, dataSocket, "");
     *pass = false;
     return;
   }
@@ -269,12 +268,12 @@ void Server::handle_help(std::vector<std::string> parsed, int commandSocket,
               int dataSocket, bool user, bool pass, std::string username) { 
   if(!user || !pass){
     send(commandSocket, "332: Need account for login.", 29, 0);
-    printLoginError("help", commandSocket, dataSocket);
+    print_login_error("help", commandSocket, dataSocket);
     return;
   }
   if(parsed.size() != 1){
     send(commandSocket, "501: Syntax error in parameters or arguments.", 46, 0);
-    printSyntaxError("help", commandSocket, dataSocket, username);
+    print_syntax_error("help", commandSocket, dataSocket, username);
     return;
   }
   send(commandSocket, "214", 4, 0);
@@ -311,12 +310,12 @@ std::string Server::checkForServer(std::string cwd, bool* flag){
 void Server::handle_dl(std::vector<std::string> parsed, int commandSocket, int dataSocket, bool user, bool pass, bool isAdmin, std::string cwd, std::string loggedInUsername){
   if(!user || !pass){
     send(commandSocket, "!332: Need account for login.", 30, 0);
-    printLoginError("retr", commandSocket, dataSocket);
+    print_login_error("retr", commandSocket, dataSocket);
     return;
   }
   else if(parsed.size() != 2){
     send(commandSocket, "!501: Syntax error in parameters or arguments.", 47, 0);
-    printSyntaxError("retr", commandSocket, dataSocket, loggedInUsername);
+    print_syntax_error("retr", commandSocket, dataSocket, loggedInUsername);
     return;
   }
   std::string path = get_curr_path() + fix_address(cwd);
@@ -369,24 +368,24 @@ void Server::handle_dl(std::vector<std::string> parsed, int commandSocket, int d
 }
 
 void Server::handle_upload(std::vector<std::string> parsed, int commandSocket, int dataSocket, bool user, bool pass, bool isAdmin, std::string cwd, std::string loggedInUsername){
-  if(!user || !pass){
+  if(!user || !pass) {
     send(commandSocket, "!332: Need account for login.", 30, 0);
-    printLoginError("Upload", commandSocket, dataSocket);
+    print_login_error("Upload", commandSocket, dataSocket);
     return;
   }
-  if(!isAdmin){
+  if(!isAdmin) {
     send(commandSocket, "ONLY ADMINS CAN UPLOAD FILES!", 29, 0);
-    printLoginError("Upload", commandSocket, dataSocket);
+    print_login_error("Upload", commandSocket, dataSocket);
     return;
   }
-  else if(parsed.size() != 2){
+  else if(parsed.size() != 2) {
     send(commandSocket, "!501: Syntax error in parameters or arguments.", 47, 0);
-    printSyntaxError("Upload", commandSocket, dataSocket, loggedInUsername);
+    print_syntax_error("Upload", commandSocket, dataSocket, loggedInUsername);
     return;
   }
 
   const char* dirname = "Files";
-  mkdir(dirname,0777);
+  mkdir(dirname, 0777);
 
   std::string path = get_curr_path() + fix_address(cwd);
   path += "/" + parsed[1];
@@ -425,19 +424,22 @@ void Server::handle_quit(std::vector<std::string> parsed, int commandSocket, int
                    bool* isAdmin, std::string *loggedInUsername){
   if(!user || !pass){
     send(commandSocket, "332: Need account for login.", 29, 0);
-    printLoginError("quit", commandSocket, dataSocket);
+    print_login_error("quit", commandSocket, dataSocket);
     return;
   }
   if(parsed.size() != 1){
     send(commandSocket, "501: Syntax error in parameters or arguments.", 46, 0);
-    printSyntaxError("quit", commandSocket, dataSocket, *loggedInUsername);
+    print_syntax_error("quit", commandSocket, dataSocket, *loggedInUsername);
     return;
   }
   print_time();
-  logs<<"client "<<*loggedInUsername<<" with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
-      <<", used 'quit' command"<<std::endl;
-  *user = false; *pass = false; *isAdmin = false;
-  *directory = "./server"; *loggedInUsername = "";
+  logs<<"client "<<*loggedInUsername<<" with command socket id: "<<commandSocket<<
+      ", data socket id: "<<dataSocket<<", used 'quit' command"<<std::endl;
+  *user = false; 
+  *pass = false; 
+  *isAdmin = false;
+  *directory = "./server"; 
+  *loggedInUsername = "";
   send(commandSocket, "221: Successful Quit.", 22, 0);
 }
 
@@ -454,7 +456,7 @@ void Server::send_help(int commandSocket) {
 void Server::handle_error(int commandSocket, int dataSocket){
   send(commandSocket, "500: Error", 11, 0);
   print_time();
-  logs<<"client with command socket id: "<<commandSocket<<", data socket id: "<<dataSocket
-      <<", entered an unknown command."<<std::endl;
+  logs<<"client with command socket id: "<<commandSocket<<", data socket id: "
+      <<dataSocket<<", entered an unknown command."<<std::endl;
 }
 

@@ -22,8 +22,8 @@ class  Server {
     void handle_help(std::vector<std::string>, int, int, bool, bool, std::string);
     void handle_dl(std::vector<std::string>, int, int, bool, bool, bool, std::string, std::string);
     void handle_upload(std::vector<std::string>, int, int, bool, bool, bool, std::string, std::string);
-    void handle_quit(std::vector<std::string>, int, int, bool*, bool*, std::string*,bool*, std::string*);
-    void handle_info(void* );
+    void handle_quit(std::vector<std::string>, int, int, bool*, bool*, std::string*, bool*, std::string*);
+    void handle_info(void*);
     void send_help(int);
     void handle_error(int, int);
     static void print_time();
@@ -42,6 +42,6 @@ class  Server {
     std::vector<std::string> login_commands{"Upload", "retr", "help", "quit"};
     std::vector<std::string> help;
 
-    void printLoginError(std::string, int, int);
-    void printSyntaxError(std::string, int, int, std::string);
+    void print_login_error(std::string, int, int);
+    void print_syntax_error(std::string, int, int, std::string);
 };
