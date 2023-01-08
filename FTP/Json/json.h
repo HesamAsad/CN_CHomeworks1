@@ -1,3 +1,6 @@
+#ifndef JSON_H
+#define JSON_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -21,3 +24,5 @@ class Json {
     std::string getCommandPort();
     std::string getDataPort();
 };
+
+#endif

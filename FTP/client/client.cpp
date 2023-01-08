@@ -1,4 +1,6 @@
 #include "client.h"
+#include "../Utils/utils.h"
+#include <sys/stat.h>
 using namespace std; 
 
 struct sockaddr_in addrSocket;
@@ -6,16 +8,10 @@ struct sockaddr_in dataSocketAddr;
 int broadcastFD;
 int dataFD;
 
-bool file_exists(const char* filename){
-    std::ifstream infile(filename);
-    return infile.good();
-}
-
-
 void Client::connect_channel(char* ports[]) {
     if((broadcastFD = socket(AF_INET, SOCK_STREAM, 0)) < 0 ||
         (dataFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        std::cout << "failed to open socket" << std::endl;
+        cout << "failed to open socket" << endl;
         exit(EXIT_FAILURE);
     }
     addrSocket.sin_family = AF_INET;
@@ -25,24 +21,24 @@ void Client::connect_channel(char* ports[]) {
     dataSocketAddr.sin_port = htons(atoi(ports[1]));
     dataSocketAddr.sin_addr.s_addr = inet_addr(DATA_ADDR);
     if(connect(broadcastFD, (struct sockaddr*) &addrSocket, sizeof(addrSocket)) < 0
-        || connect(dataFD, (struct sockaddr*) &dataSocketAddr, sizeof(dataSocketAddr)) < 0){
-      std::cout << "failed to connect" << std::endl;
+        || connect(dataFD, (struct sockaddr*) &dataSocketAddr, sizeof(dataSocketAddr)) < 0) {
+      cout << "failed to connect" << endl;
       exit(EXIT_FAILURE);
     }
     int port;
-    char* in = new char[250];
-    recv(broadcastFD, in, 250, 0);
-    std::cout << in << std::endl;
+    char* in = new char[ACK_MSG_LEN];
+    recv(broadcastFD, in, ACK_MSG_LEN, 0);
+    cout << in << endl;
     delete in;
-    in = new char[250];
-    recv(dataFD, in, 250, 0);
-    std::cout << in << std::endl;
+    in = new char[ACK_MSG_LEN];
+    recv(dataFD, in, ACK_MSG_LEN, 0);
+    cout << in << endl;
     delete in;
 }
 
 void Client::handle_info() {
-    char in[256];
-    std::cin.getline(in, 256);
+    char in[MAXCMDLEN];
+    cin.getline(in, MAXCMDLEN);
     if(send(broadcastFD, in, sizeof(in), 0) < 0)
         exit(EXIT_FAILURE);
     if(strcmp(in, "exit") == 0)
@@ -51,64 +47,57 @@ void Client::handle_info() {
         handle_help();
         return;
     }
-    else if (in[0] == 'r' && in[1] == 'e' && 
-                in[2] == 't' && in[3] == 'r') {        //retr
+    else if (strstr(in, "retr") != NULL) {        //retr
         handle_dl(in+5);
         return;
     }
-    else if (in[0] == 'U' && in[1] == 'p' && 
-                in[2] == 'l' && in[3] == 'o' && 
-                in[4] == 'a' && in[5] == 'd') {        //Upload
+    else if (strstr(in, "Upload") != NULL) {        //Upload
         handle_upload(in+7);
         return;
     }
-    char* msg = new char[256]; 
-    recv(broadcastFD, msg, 256, 0);
-    std::cout << msg << std::endl;
+    char* msg = new char[ACK_MSG_LEN]; 
+    recv(broadcastFD, msg, ACK_MSG_LEN, 0);
+    cout << msg << endl;
 }
 
 void Client::handle_help() {
-    char* msg = new char[256]; 
-    recv(broadcastFD, msg, 256, 0);
-    msg[strlen(msg)] = '\0';
-    std::cout << msg << std::endl;
+    char* msg = new char[4]; 
+    memset(msg, '\0', 4);
+    recv(broadcastFD, msg, 4, 0);
+    cout << msg << endl;
     if(strcmp(msg, "214") != 0) {
         delete msg;
         return;
     }
     delete msg;
-    char in[2000];
-    memset(in, '\0', 2000);
-    recv(broadcastFD, in, 2000, 0);
-    std::cout<<in<<std::endl;
+    char* in = new char[2048];
+    memset(in, '\0', 2048);
+    recv(broadcastFD, in, 2048, 0);
+    cout<<in<<endl;
+    delete in;
 }
 
 void Client::handle_dl(char* file_name) {
-    char* result = new char[256];
-    memset(result, 0, 256);
-    recv(broadcastFD, result, 256, 0);
+    char* result = new char[ACK_MSG_LEN];
+    memset(result, 0, ACK_MSG_LEN);
+    recv(broadcastFD, result, ACK_MSG_LEN, 0);
     if(result[0] == '!') {
-        std::cout << result+1 << std::endl;
+        cout << result+1 << endl;
         return;
     }
-
-    char* msg = new char[50];
-    std::string file_content = "";
-    memset(msg, 0, 50);
-    recv(dataFD, msg, 50, 0);
+    char* username = new char[MAXUSERNAMELEN];
+    memset(username, 0, MAXUSERNAMELEN);
+    recv(broadcastFD, username, MAXUSERNAMELEN, 0);
+    mkdir((string(username)+string("'s Files")).c_str(), 0777);
+    char* msg = new char[MAXMSGLEN];
+    string file_content = "";
+    memset(msg, 0, MAXMSGLEN);
+    recv(dataFD, msg, MAXMSGLEN, 0);
     file_content += msg;
-    memset(msg, 0, 50);
-    while(1) {
-        int r = recv(dataFD, msg, 50, MSG_DONTWAIT);
-        if(r <= 0)
-            break;
-        file_content += msg;
-        memset(msg, 0, 50); 
-    }
-    std::ofstream out(file_name);
+    ofstream out(string(username)+string("'s Files/")+extract_file_name(string(file_name)));
     out << file_content;
     out.close();
-    std::cout << result+1 << std::endl;
+    cout << result+1 << endl;
     delete result;
     delete msg;
 }
@@ -119,27 +108,24 @@ void Client::handle_upload(char* file_name) {
         send(broadcastFD, "!500: Error", 12, 0);
         return;
     }
-    std::string file = string(file_name);
-    std::ifstream ifs(file);
-    std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                        (std::istreambuf_iterator<char>()    ) );
+    char* result = new char[ACK_MSG_LEN];
+    memset(result, 0, ACK_MSG_LEN);
+    recv(broadcastFD, result, ACK_MSG_LEN, 0);
+    if(result[0] == '!') {
+        cout << result+1 << endl;
+        return;
+    }
+    string file = string(file_name);
+    ifstream ifs(file);
+    string content( (istreambuf_iterator<char>(ifs) ),
+                        (istreambuf_iterator<char>()    ) );
     ifs.close();
-    int max_size = 1024*1024;
     int content_size = content.size();
-    if((max_size - content_size) < 0) {
-        cout << "FILE TOO LARGE!" << std::endl;
+    if((MAXMSGLEN - content_size) < 0) {
+        cout << "FILE TOO LARGE!" << endl;
         send(broadcastFD, "!500: Error", 12, 0);
         return;
     } 
     send(broadcastFD, "#226: Successfull Upload.", 28, 0);
     send(dataFD, content.c_str(), content.size()+1, 0);
-}
-
-char* str2charstar(std::string s) {
-  char* p = new char[s.length() + 1];
-  int i;
-  for (i = 0; i < s.length(); i++)
-      p[i] = s[i];
-  p[s.length()] = '\0';
-  return p;
 }
