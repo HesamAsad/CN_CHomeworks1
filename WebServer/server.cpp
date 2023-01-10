@@ -1,7 +1,9 @@
 #include <bits/stdc++.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #define BUFF_SIZE 8192
