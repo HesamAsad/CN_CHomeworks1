@@ -1,0 +1,7 @@
+.PHONY
+
+server: server.cpp
+	g++ -o $@ $@.cpp
+
+clean:
+	rm -rf server
