@@ -200,4 +200,4 @@ Connects the two channel ports and waits for the user to input the next command.
 Note that if a client downloads a file, the file would be stored in a (new) folder with the client's name!
 
 ## Results:
-![Results](results.gif)
+![Results](https://github.com/HesamAsad/CN_CHomeworks1/blob/main/FTP/results.gif)
