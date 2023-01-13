@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 			sprintf(file_name, "%s", parsed_data);
 
 		if (strlen(file_name) <= 1) //default file to be shown is localhost:{PORT}/index.html
-			strcpy(file_name, "/index.html"); 
+			strcpy(file_name, "/files/index.html"); 
 
 		//calculating and storing current time
 		char date_temp[32] = { 0 };
@@ -156,11 +156,12 @@ int main(int argc, char* argv[]) {
 
 		char curr_dir[1024] = { 0 };
 		getcwd(curr_dir, 1024); 
+		strcat(curr_dir, "/files/");
 		strcat(curr_dir, file_name); 
 
 		int file_fd = open(curr_dir, O_RDONLY); 
 		if (file_fd <= 0)
-			file_fd = open("404.html", O_RDONLY); 
+			file_fd = open("files/404.html", O_RDONLY); 
 		if (file_fd > 0) {
 			int res = write(newsockfd, response_header, header_size);
 			if (res <= 0)
