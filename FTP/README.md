@@ -41,7 +41,14 @@ Each client has the following commands:
     Upload {File Path}
     ```
 
-## Utils Part
+
+## Root directory and project structure
+
+The root directory consists of the *client*, *Json*, *server*, and *Utils* folders. The *Json* folder contains files that help us read and parse the *config.json* file available in the server folder. *config.json* stores the information about the command and data channel ports and some users' data such as usernames and passwords. It also tells us, which users are admins, and also the download limit (volume) for each user. 
+
+The following describes the other three folders in more details.
+
+## Utils Folder
 * This module contains some helper functions which can be executed independently. 
 * `socketData` struct is defined in this module as a combination of command channel socket and data channel socket:
 ```cpp
@@ -55,7 +62,7 @@ struct socketData
 * `get_curr_path` return a string containing current path of the executed program.
 * `extract_file_name` gets a file path and extracts just the name and extension of the file (removing it's parent path). (i.e. input: `/path/to/my/file/f1.cpp` &rarr; output: `f1.cpp`)
 
-## Server Part
+## Server Folder
 
 ### main:
 ```cpp
@@ -142,11 +149,28 @@ class  Server {
 ```
 * Our server stores a Json object which handles parsing and retrieving information from the `config.json` file.
 * A `logs` variable is also stored in the server which is the log file we create and complete.
-* Vectors of users, protected files, and commands that are permitted only when user is logged in are stored in the server object.
+* Vectors of users, protected files, and commands that are permitted only when user is logged in, are stored in the server object.
 * A number of helper functions are utilized to handle `user`, `password`, `help`, `retr`, `Upload`, and `quit` commands.
 
-## Client Part
-## client:
+We now describe some of the more important functions in *server.cpp*.
+* `handle_connections` is the function that's being called in *main.cpp* and handles both the request and data connections. If it cannot connect, it exits with an *EXIT_FAILURE* code, otherwise, it returns a new *socketData* variable we'll later use to handle user inputs.
+
+* `connect_channel` sets the required settings to bind two sockets to both data and request channels and listens on the respective ports.
+
+* `find_username` checks if there's a particular username present.
+* `find_pass` checks if there input username and password match.
+* `handle_user` handles the case where user wants to login.
+* `handle_info` is a high-level function which handles the input from the command line. It calls the respective function for each of the available commands a user can type.
+* `handle_password` if the input user and password are available (with the help from `find_pass`), this function logs the user into our program.
+* `handle_help` handles the help command and calls `send_help` function.
+* `handle_dl` checks if the input file exists and if the user has enough download credit. If so, it retrieves the file and stores it in a folder with the user's name. 
+* `handle_upload` checks if the user is an admin. If so, it uploads the file to the *Files* folder available in the *server* folder.
+* `handle_quit` logs out the username and deletes any useless variable.
+
+
+## Client Folder
+
+### client:
 ```cpp
 class Client {
   public:
@@ -158,9 +182,9 @@ class Client {
 };
 ```
 * Obviously, this class contains a number of handler functions to handle 4 primary commands.
-* These handler functions are paired with their couple in the server. Each `receive` in client is mapped to a `send` in server and vice versa.
+* These handler functions are paired with their couple in the server which were explained above. Each `receive` in client is mapped to a `send` in server and vice versa.
 
-## main:
+### main:
 ```cpp
 ports[0] = new char[256];
 ports[1] = new char[256];
@@ -170,3 +194,7 @@ c.connect_channel(ports);
 
 FOREVER c.handle_info();
 ```
+
+Connects the two channel ports and waits for the user to input the next command. It handles the commands by calling the `handle_info` function described above.
+
+Note that if a client downloads a file, the file would be stored in a (new) folder with the client's name!
