@@ -1,7 +1,7 @@
 # CN-CA1-Hesam-Melika-Borna
 
 ### About:
-Our first *Computer Networks* computer assingment, consists of three seperate mini projects.
+Our first *Computer Networks* computer assignment, consists of three seperate mini projects.
 Each can be found at their representative folders.
 
 * FTP Server
