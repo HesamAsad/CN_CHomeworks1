@@ -115,4 +115,4 @@ If such file (or url), doesn't exist, we'll redirect the user to a simple *404 N
 Finally, note that if the user doesn't input anything. We redirect him to a simple *index.html* page.
 
 ## Results:
-![Results](results.gif)
+![Results](https://github.com/HesamAsad/CN_CHomeworks1/blob/main/WebServer/results.gif)
