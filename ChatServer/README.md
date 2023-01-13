@@ -1,5 +1,53 @@
 # Chat Server
 
+## To Run:
+Simply use make to make both server and client object files. Then bring up the server on your desired port with command:
+```console
+{Your Path}/server {Port (i.e. 8080)}
+```
+
+and then connect as many clients as you like, each with the following command:
+```console
+{Your Path}/client {Port (i.e. localhost:8080)} {Username (i.e. Ali)}
+```
+
+Each client has the following commands:
+
+* `list` which shows a list of all clients that are connected at the time.
+
+    ```console
+    list
+    ```
+
+* `send` which is used to communicate between clients. This command sends message *MSG* to username *Username*.
+
+    ```console
+    send {Username} {MSG}
+    ```
+
+* `exit` which is used to disconnect our connect.
+
+    ```console
+    exit
+    ```
+
+
+## Root directory and project structure
+
+The root directory consists of the client and server folders along with Makefile, *message.h* header and our results.
+
+We've stored the structure of our headers (along with some message id definitions) in the latter, as shown below.
+
+```Cpp
+typedef struct h {
+    uint8_t message_type:4;
+    uint8_t message_id:4;
+    uint8_t length;
+} Header;
+```
+
+The following are further detail about each of the folders and their contents.
+
 ## Server Part
 ### user:
 ```Cpp
@@ -78,7 +126,7 @@ private:
         
         3.2. It reads the payload of the message and stores it in `payload`.
         
-        3.3. It try to `switch` on `header.message_type` and call the corresponding handler for each message type.
+        3.3. It tries to `switch` on `header.message_type` and call the corresponding handler for each message type.
         
         3.4. `handle_connect`, `handle_list`, `handle_info`, `handle_send`, and `handle_receive` functions try to create a message with `CONNACK`, `LISTREPLY`, `INFOREPLY`, `SENDREPLY`, `RECEIVEREPLY` headers respectively and attach proper payload of each type of message to it before sending it back to server.
 
@@ -133,10 +181,14 @@ Server::Server(uint16_t port) {
 
 ## Client Part
 
+This is the interface the client uses to connect to the server. Here's how:
+
 * First, each new client connects to the tcp socket (given the host and port of the server). 
 * Then, it sends the very first connect request to the server. `send_connect_request` function handles this request. It creates a message with the `CONNECT` header and sends the client's username following message's header. `send_connect_request` expects a message with `CONNACK` header from server.
 * After connecting to the server, a separate `thread` is used to run an infinite loop which tries to receive a new message from server. If such a message exists, it's going to be printed on the console.
 * The main thread of the client is also an infinite loop which handles incoming commands from console (`list`, `send`, or `exit`) and handles it.
+
+
 
 ## Results:
 ![Results](results.gif)
