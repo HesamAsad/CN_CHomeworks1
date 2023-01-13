@@ -1,3 +1,6 @@
+#ifndef CLIENT_H
+#define CLIENT_H
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,8 +22,10 @@
 #define REQUEST_ADDR "127.0.0.1"
 #define DATA_ADDR "127.0.0.2"
 #define FOREVER while(1)
-
-char* str2charstar(std::string s);
+#define ACK_MSG_LEN 256
+#define MAXMSGLEN 1024*1024
+#define MAXUSERNAMELEN 256
+#define MAXCMDLEN 256
 
 class Client {
   public:
@@ -30,3 +35,5 @@ class Client {
     void handle_dl(char* file_name);
     void handle_upload(char* file_name);
 };
+
+#endif
