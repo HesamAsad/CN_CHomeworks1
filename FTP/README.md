@@ -1,5 +1,46 @@
 # FTP Server
 
+## To Run:
+Simply use makefiles present in client and server folders to make both server and client object files. Then bring up the server on your desired port with command:
+```console
+./{SERVER PATH}/server {Port (i.e. 8080)}
+```
+
+and then connect a client, with the following command:
+```console
+./{CLIENT PATH}/client {Port (i.e. 8080)}
+```
+
+Each client has the following commands:
+
+* `user` which is used to enter username, in order to login.
+
+    ```console
+    user {Username}
+    ```
+
+* `pass` which is used to enter password of previously entered username, in order to complete the login procedure.
+
+    ```console
+    pass {Password}
+    ```
+
+* `quit` which is used to logout.
+
+    ```console
+    quit
+    ```
+
+* `retr` which is used to download a file. It downloads the specified file to a directory named `{Username}'s Files` for each user.
+    ```console
+    retr {File Path}
+    ```
+
+* `Upload` which is used to Upload a file (just for admin users). It uploads a file to the `Files` directory in the server's dir.
+    ```console
+    Upload {File Path}
+    ```
+
 ## Utils Part
 * This module contains some helper functions which can be executed independently. 
 * `socketData` struct is defined in this module as a combination of command channel socket and data channel socket:
