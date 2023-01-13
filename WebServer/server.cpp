@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//used to log errors
 void error (string msg) {
 	cerr << msg << endl;
 	exit(1);

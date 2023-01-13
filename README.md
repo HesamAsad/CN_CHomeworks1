@@ -12,6 +12,6 @@ Each can be found at their representative folders.
 
 This project was a mutual work of the following people:
 
-    @HesamAsad
-    @Melikad
-    @Borna-tl
+    @github/HesamAsad
+    @github/Melikad
+    @github/Borna-tl

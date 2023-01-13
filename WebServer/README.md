@@ -31,147 +31,88 @@ The root directory consists of the files folder along with Makefile, *sever.cpp*
 The makefile is simply used to generate the sever object file. There are also plenty of informative comments in the *sever.cpp* file that explain the different parts of our code.
 The following is an explanation of *server.cpp* in more details.
 
-## Server.cpp
-### user:
+## server.cpp
+
+### Building the server:
+to do so, we input a server port from the command line and set the required settings.
 ```Cpp
-struct User {
-    std::string name;
-    std::queue<std::pair<int, std::string>> messages;
-};
-```
-* We define users as structs of their names and messages. 
-* We store messages of users in a queue.
-* Each message is a pair of its ID and its content.
-### chatRoom:
+    //getting port number from cmd
+	port_number = atoi(argv[1]);
 
+	//ipv4 will be used to fill serv_addr
+	serv_addr.sin_family = AF_INET; 
+
+	//INADDR_ANY is an argument to bind that tells the socket to listen on all available interfaces.
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
+	
+	//convert from host to network byte order
+	serv_addr.sin_port = htons(port_number); 
+
+	if (bind(sockfd, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0) 
+		error("Cannot bind");
+	else	
+		cout << "Server is up..." << endl;
+```
+
+### Waiting for requests:
+We listen on our *sock_fd* and queue at most 10 connections. We then accept requests on *newsockfd* from time to time, and check whether there's been an actual request or not. 
 ```Cpp
-class ChatRoom {
-public:
-    int connect(std::string name);
-    void disconnect(int user_id);
-    void send(int from_id, int to_id, std::string message);
-    std::pair<int, std::string> receive(int id);
-    std::vector<int> list();
-    User info(int user_id);
-private:
-    std::map<int, User> users;
-    int next_user_id = 1;
-};
-```
-* This class is a top-level chatRoom class which handles users, connecting and disconnecting them, and sending messages from a user to another.
-* `send` function adds an incoming message with a new messageID to the `messages` queue of the user.
-* `receive` function pops a message from `messages` queue of the user and returns it.
-* `connect` function adds a new user to the `users` map of the class.
-* `disconnect` function removes an exitted user from `users` map of the class.
-* `info` function returns `User` struct of a given userID. returned struct contains user's name and messages.
-* `list` function returns a vector of the names of all users.
+    listen(sockfd, 10); 
+    socklen_t clilen = sizeof(cli_addr); 
+    newsockfd = accept(sockfd, (struct sockaddr*) &cli_addr, &clilen);
+    
+    if (newsockfd < 0) 
+        error("Cannot accept client request!"); 
 
-### client (in Server):
-```Cpp
-class Client {
-public:
-    Client(int fd, ChatRoom& room);
-    ~Client();
-    int run();
-    int fd;
+    memset(clientReq, 0, BUFF_SIZE); 
+    n = read(newsockfd, clientReq, BUFF_SIZE); 
+    
+    if (n < 0) 
+        error("Cannot read from socket");
 
-private:
-    void read(uint8_t* buffer, size_t len);
-    void write(const uint8_t* buffer, size_t len);
-    void connect(std::string name);
-    void handle_connect(Header& h, uint8_t* payload, int payload_length);
-    void handle_list(Header& h);
-    void handle_info(Header& h, uint8_t* payload);
-    void handle_send(Header& h, uint8_t* payload, int payload_length);
-    void handle_receive(Header& h);
-    std::vector<int> list();
-    User info(int user_id);
-    void send(int, std::string message);
-    std::pair<int, std::string> receive();
-
-    ChatRoom& room;
-    bool connected = false;
-    int user_id = 0;
-};
-```
-
-* This class is actually the main class which contains functions that handle incoming requests from client, create reply headers, and send proper server-side replies to clients.
-* Each client contains a unique file descriptor which is the communication link between client and server.
-* Each client contains a top-level chatRoom which is the global chatroom object that handles users.
-* `read` and `write` functions are wrapper functions to read and write from/to fd socket.
-* `connect`, `list`, `info`, `send`, `receive` functions are also wrapper functions which call `chatRoom`'s corresponding functions to perform the proper function.
-* `run` is the most important method of this class which tries to:
-    1. read an incoming message from socket.
-    2. if there's not any incoming message, function terminates.
-    3. if there's an available incoming message:
-
-        3.1. It receives the header of the message and stores it in `header`.
-        
-        3.2. It reads the payload of the message and stores it in `payload`.
-        
-        3.3. It tries to `switch` on `header.message_type` and call the corresponding handler for each message type.
-        
-        3.4. `handle_connect`, `handle_list`, `handle_info`, `handle_send`, and `handle_receive` functions try to create a message with `CONNACK`, `LISTREPLY`, `INFOREPLY`, `SENDREPLY`, `RECEIVEREPLY` headers respectively and attach proper payload of each type of message to it before sending it back to server.
-
-### server:
-```cpp
-class Server {
-public:
-    int fd;
-    Server(std::uint16_t port);
-    ~Server();
-    void run();
-    Client* find_client(int fd);
-private:
-    ChatRoom room;
-    std::vector<Client*> clients;
-    void client(int);
-    int accept_client(int server_fd);
-};
-```
-
-* This class contains a vector of all clients, main chatRoom object, and server's file descriptor.
-* The constructor of the class initializes the server with the following configurations:
-```cpp
-Server::Server(uint16_t port) {
-    struct sockaddr_in srv_addr;
-    srv_addr.sin_family = AF_INET;
-    srv_addr.sin_port = htons(port);
-    srv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    fd = socket(AF_INET, SOCK_STREAM, 0);
-    int opt = 1;
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    try {
-        auto err = bind(fd, (struct sockaddr*)&srv_addr, sizeof(srv_addr));
-        if (err < 0)
-            throw runtime_error("failed to bind");
-        else 
-            cout << "Server is running..." << endl;
-        err = listen(fd, 10);
-        if (err < 0)
-            throw runtime_error("failed to listen");
-    } catch (exception) {
-        close(fd);
-        throw;
+    if (n == 0) {
+        cout << "No request sent from web..." << endl;
+        close(newsockfd);
+        continue;
     }
-}
+    cout << "Client request is:\n" << clientReq << endl;
+
+
 ```
-* In summary, it creates a `sockaddr_in` struct and assigns its `sin_family`, `sin_port`, and `sin_addr.s_addr`; then, it creates a socket and stores its file descriptor in `fd`. In `setsockopt` function, to manipulate options at the sockets API level, level is specified as `SOL_SOCKET`. `SO_REUSEADDR` specifies that the rules used in validating addresses supplied to `bind` should allow reuse of local addresses, if this is supported by the protocol. Finally, when  a  socket  is created with `socket`, it exists in a name space (address family) but **has no address assigned to it**.  `bind` assigns the address specified by `srv_addr` to the socket  referred  to by  the  `fd`. 
-* `listen` marks  the  socket referred to by `fd` as a passive socket, that is, as a socket that will be used to accept incoming connection requests using `accept`.
-* clients are being accepted in `accept_client` function.
-* `run` function is the most important method of this class. It employs `select` to switch between active sockets. Actually, `select` allows a program to **monitor multiple file descriptors**, waiting until one or more of the file descriptors become "ready" for some class of I/O operation. Finally, this method calls each client's `run` function to handle the incoming request.
 
-## Client Part
+### Parsing and handling data:
+If there's been an actual request, we proceed to parse it and extract different components such as the protocol used or the url that was entered. At the same time, we'll build `response_header` or `error_header` (in the case of running into an error), which will later be written to `newsockfd` repectively.
+The `response_header` consists of status, current date and content type (which are extracted from the request).
+The `error_header` consists of protocol, error_status, current date and etc. 
 
-This is the interface the client uses to connect to the server. Here's how:
+If all is well, we'll look up the file that was entered, open it, and show its content.
+If such file (or url), doesn't exist, we'll redirect the user to a simple *404 Not Found* page. 
+```Cpp
+    char curr_dir[1024] = { 0 };
+		getcwd(curr_dir, 1024); 
+		strcat(curr_dir, "/files/");
+		strcat(curr_dir, file_name); 
 
-* First, each new client connects to the tcp socket (given the host and port of the server). 
-* Then, it sends the very first connect request to the server. `send_connect_request` function handles this request. It creates a message with the `CONNECT` header and sends the client's username following message's header. `send_connect_request` expects a message with `CONNACK` header from server.
-* After connecting to the server, a separate `thread` is used to run an infinite loop which tries to receive a new message from server. If such a message exists, it's going to be printed on the console.
-* The main thread of the client is also an infinite loop which handles incoming commands from console (`list`, `send`, or `exit`) and handles it.
+		int file_fd = open(curr_dir, O_RDONLY); 
+		if (file_fd <= 0)
+			file_fd = open("files/404.html", O_RDONLY); 
+		if (file_fd > 0) {
+			int res = write(newsockfd, response_header, header_size);
+			if (res <= 0)
+				error("Cannot write header!");
 
+			char file_content[FILE_SIZE] = { 0 }; 
+			while ( (n = read(file_fd, file_content, FILE_SIZE)) > 0) {
+				res = write(newsockfd, file_content, n); 
+				if (res <= 0)
+					error("Cannot write file!");
+				memset(file_content, 0, FILE_SIZE);
+			}
+			close(file_fd);
+		}
+```
 
+Finally, note that if the user doesn't input anything. We redirect him to a simple *index.html* page.
 
 ## Results:
 ![Results](results.gif)
