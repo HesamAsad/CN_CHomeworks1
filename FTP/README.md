@@ -198,3 +198,6 @@ FOREVER c.handle_info();
 Connects the two channel ports and waits for the user to input the next command. It handles the commands by calling the `handle_info` function described above.
 
 Note that if a client downloads a file, the file would be stored in a (new) folder with the client's name!
+
+## Results:
+![Results](results.gif)
